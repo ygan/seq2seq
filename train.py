@@ -36,7 +36,7 @@ def evaluate(model, val_iter, vocab_size, DE, EN):
         loss = F.nll_loss(output[1:].view(-1, vocab_size),
                                trg[1:].contiguous().view(-1),
                                ignore_index=pad)
-        total_loss += loss.data[0]
+        total_loss += loss.data  #total_loss += loss.data[0]
     return total_loss / len(val_iter)
 
 
@@ -56,9 +56,10 @@ def train(e, model, optimizer, train_iter, vocab_size, grad_clip, DE, EN):
         loss.backward()
         clip_grad_norm(model.parameters(), grad_clip)
         optimizer.step()
-        total_loss += loss.data[0]
 
-        if b % 100 == 0 and b != 0:
+        total_loss += loss.data  # total_loss += loss.data[0]
+        
+        if b % 100 == 0 :#if b % 100 == 0 and b != 0:
             total_loss = total_loss / 100
             print("[%d][loss:%5.2f][pp:%5.2f]" %
                   (b, total_loss, math.exp(total_loss)))
@@ -67,26 +68,38 @@ def train(e, model, optimizer, train_iter, vocab_size, grad_clip, DE, EN):
 
 def main():
     args = parse_arguments()
-    hidden_size = 512
-    embed_size = 256
     assert torch.cuda.is_available()
-
+    
     print("[!] preparing dataset...")
+
     train_iter, val_iter, test_iter, DE, EN = load_dataset(args.batch_size)
-    de_size, en_size = len(DE.vocab), len(EN.vocab)
+    
+    #the default batch_size is 32. So len(train_iter.dataset)/len(train_iter)=batch_size
     print("[TRAIN]:%d (dataset:%d)\t[TEST]:%d (dataset:%d)"
           % (len(train_iter), len(train_iter.dataset),
              len(test_iter), len(test_iter.dataset)))
-    print("[DE_vocab]:%d [en_vocab]:%d" % (de_size, en_size))
+    
+    de_size, en_size = len(DE.vocab), len(EN.vocab)
+    print("[DE_vocab]:%d [EN_vocab]:%d" % (de_size, en_size))
 
     print("[!] Instantiating models...")
+
+    #input is de, output is en
+    hidden_size = 512 #output size of Encoder; input size of Decoder??????????
+    embed_size = 256
+    #Encoder encode the sentence that is a vector like [word1(index of vocab) word2(index of vocab) ....]
+    #become a matrix like [word1(word vecotor) word2(word vecotor) ....]. This is world embeding. The size of word vecotor equal to embed_size.
+    #And then use this matrix to train a RNN that will output a matrix like [word1(word encoding) word2(word encoding) ....]
+    #The length of vector of word encoding equal to hidden_size.
     encoder = Encoder(de_size, embed_size, hidden_size,
                       n_layers=2, dropout=0.5)
+
+    
     decoder = Decoder(embed_size, hidden_size, en_size,
                       n_layers=1, dropout=0.5)
     seq2seq = Seq2Seq(encoder, decoder).cuda()
     optimizer = optim.Adam(seq2seq.parameters(), lr=args.lr)
-    print(seq2seq)
+    #print(seq2seq)
 
     best_val_loss = None
     for e in range(1, args.epochs+1):
