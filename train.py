@@ -50,6 +50,8 @@ def train(e, model, optimizer, train_iter, vocab_size, grad_clip, DE, EN):
         src, trg = src.cuda(), trg.cuda()
         optimizer.zero_grad()
         output = model(src, trg)
+        # I read this page: http://neuralnetworksanddeeplearning.com/chap3.html and it said that
+        # sigmoid output layer with cross-entropy is quite similiar with softmax output layer with log-likelihood.
         loss = F.nll_loss(output[1:].view(-1, vocab_size),
                                trg[1:].contiguous().view(-1),
                                ignore_index=pad)

@@ -1,3 +1,6 @@
+# edition note
+I make it suitable for pytorch 1.0 and download the data manually and add some comments.
+
 # mini seq2seq
 Minimal Seq2Seq model with attention for neural machine translation in PyTorch.
 
