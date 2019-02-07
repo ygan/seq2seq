@@ -47,6 +47,10 @@ def train(e, model, optimizer, train_iter, vocab_size, grad_clip, DE, EN):
     for b, batch in enumerate(train_iter):
         src, len_src = batch.src
         trg, len_trg = batch.trg
+        print(src)
+        print(len_src)
+        print(trg)
+        print(len_trg)
         src, trg = src.cuda(), trg.cuda()
         optimizer.zero_grad()
         output = model(src, trg)
@@ -79,10 +83,10 @@ def main():
     #the default batch_size is 32. So len(train_iter.dataset)/len(train_iter)=batch_size
     print("[TRAIN]:%d (dataset:%d)\t[TEST]:%d (dataset:%d)"
           % (len(train_iter), len(train_iter.dataset),
-             len(test_iter), len(test_iter.dataset)))
+             len(test_iter), len(test_iter.dataset)))               #[TRAIN]:907 (dataset:29000)     [TEST]:32 (dataset:1000)
     
     de_size, en_size = len(DE.vocab), len(EN.vocab)
-    print("[DE_vocab]:%d [EN_vocab]:%d" % (de_size, en_size))
+    print("[DE_vocab]:%d [EN_vocab]:%d" % (de_size, en_size))       #[DE_vocab]:8011 [EN_vocab]:10004
 
     print("[!] Instantiating models...")
 

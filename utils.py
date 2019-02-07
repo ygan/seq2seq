@@ -16,6 +16,9 @@ def load_dataset(batch_size):
     def tokenize_en(text):
         return [tok.text for tok in spacy_en.tokenizer(url.sub('@URL@', text))]
 
+    # create dataset according to Field object.
+    # Field define the basic token and tokenize. 
+    # Field can create vocab.
     DE = Field(tokenize=tokenize_de, include_lengths=True,
                init_token='<sos>', eos_token='<eos>')
     EN = Field(tokenize=tokenize_en, include_lengths=True,
@@ -33,6 +36,9 @@ def load_dataset(batch_size):
     #build vocabury
     #You can find one word from: DE.vocab.itos[0], it will depend on the order of frenquency
     #You can also find the index of word from: DE.vocab.stoi['word name']
+    #It will automatically create the '<pad>' into vocab even you never use it. The '<pad>' sometimes only be used after creating iterators. 
+    #It is the same to unkonw_token '<pad>'. If you want: init_token='<sos>', eos_token='<eos>', 
+    #you need to give a arguement in creating the Field object.
     DE.build_vocab(train.src, min_freq=2)
     EN.build_vocab(train.trg, max_size=10000)
 
@@ -71,10 +77,31 @@ def load_dataset(batch_size):
 # #if your file name is not the same as defualt, you must change the function input parameter: train='train', validation='val', test='test'
 # #exts parameter is the data file ext name.
 # #So the data file depends on the parameter:path+(train\validation\test)+exts
-# train, val, test = TranslationDataset.splits(path='./data/',exts=('.de', '.en'), fields=(DE, EN)) 
+# train, val, test = TranslationDataset.splits(path='./data2/',exts=('.de', '.en'), fields=(DE, EN)) 
 
 # #build vocabury
 # #You can find one word from: DE.vocab.itos[0], it will depend on the order of frenquency
 # #You can also find the index of word from: DE.vocab.stoi['word name']
+
 # DE.build_vocab(train.src, min_freq=2)
 # EN.build_vocab(train.trg, max_size=10000)
+
+# for i in range(5):
+#     print(DE.vocab.itos[i])
+
+# train_iter, val_iter, test_iter = BucketIterator.splits(
+#             (train, val, test), batch_size=2, repeat=False)
+# DE.vocab.stoi
+# for i in range(5):
+#     print(DE.vocab.itos[i])
+
+# for i in range(len(EN.vocab)):
+#     print(EN.vocab.itos[i])
+
+# for b, batch in enumerate(train_iter):
+#         src, len_src = batch.src
+#         trg, len_trg = batch.trg
+#         print(src)
+#         print(len_src)
+#         print(trg)
+#         print(len_trg)
