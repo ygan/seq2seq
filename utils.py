@@ -39,9 +39,8 @@ def load_dataset(batch_size):
     #It will automatically create the '<pad>' into vocab even you never use it. The '<pad>' sometimes only be used after creating iterators. 
     #It is the same to unkonw_token '<pad>'. If you want: init_token='<sos>', eos_token='<eos>', 
     #you need to give a arguement in creating the Field object.
-    DE.build_vocab(train.src, min_freq=2)
-    EN.build_vocab(train.trg, max_size=10000)
-
+    DE.build_vocab(train.src, min_freq=2)     # you can just use DE.build_vocab(train, min_freq=2), but not: DE.build_vocab(train.trg, min_freq=2)
+    EN.build_vocab(train.trg, max_size=10000) # you can just use EN.build_vocab(train, max_size=10000)
 
     #Create batch and make the length of every sentence in one batch become the same
     train_iter, val_iter, test_iter = BucketIterator.splits(
@@ -83,8 +82,8 @@ def load_dataset(batch_size):
 # #You can find one word from: DE.vocab.itos[0], it will depend on the order of frenquency
 # #You can also find the index of word from: DE.vocab.stoi['word name']
 
-# DE.build_vocab(train.src, min_freq=2)
-# EN.build_vocab(train.trg, max_size=10000)
+# DE.build_vocab(train, min_freq=2)
+# EN.build_vocab(train, max_size=10000)
 
 # for i in range(5):
 #     print(DE.vocab.itos[i])
