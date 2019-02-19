@@ -47,10 +47,6 @@ def train(e, model, optimizer, train_iter, vocab_size, grad_clip, DE, EN):
     for b, batch in enumerate(train_iter):
         src, len_src = batch.src
         trg, len_trg = batch.trg
-        print(src)
-        print(len_src)
-        print(trg)
-        print(len_trg)
         src, trg = src.cuda(), trg.cuda()
         optimizer.zero_grad()
         output = model(src, trg)

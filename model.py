@@ -34,7 +34,7 @@ class Encoder(nn.Module):
         # and finally create outputs[0,0,hidden_size] in left direction gru
         outputs, hidden = self.gru(embedded, hidden)    #the shape of hidden is (num_layers * num_directions, batch, hidden_size)
         #You can consider hidden as the final state of gru and equal to final outputs
-
+        
         # sum bidirectional outputs
         outputs = (outputs[:, :, :self.hidden_size] +
                    outputs[:, :, self.hidden_size:])

@@ -19,6 +19,8 @@ def load_dataset(batch_size):
     # create dataset according to Field object.
     # Field define the basic token and tokenize. 
     # Field can create vocab.
+    # If you don't define init_token and eos_token, you will not get these token when you get training batch data from train_iter
+    # Because you define the init_token and eos_token in here, you can get init_token + sentence + eos_token when you create train, val, test from TranslationDataset.splits
     DE = Field(tokenize=tokenize_de, include_lengths=True,
                init_token='<sos>', eos_token='<eos>')
     EN = Field(tokenize=tokenize_en, include_lengths=True,
@@ -42,7 +44,8 @@ def load_dataset(batch_size):
     DE.build_vocab(train.src, min_freq=2)     # you can just use DE.build_vocab(train, min_freq=2), but not: DE.build_vocab(train.trg, min_freq=2)
     EN.build_vocab(train.trg, max_size=10000) # you can just use EN.build_vocab(train, max_size=10000)
 
-    #Create batch and make the length of every sentence in one batch become the same
+    # Create batch and make the length of every sentence in one batch become the same
+    # If repeat=True, program will forever run in: 'for b, batch in enumerate(train_iter):'
     train_iter, val_iter, test_iter = BucketIterator.splits(
             (train, val, test), batch_size=batch_size, repeat=False)
     return train_iter, val_iter, test_iter, DE, EN
@@ -89,7 +92,7 @@ def load_dataset(batch_size):
 #     print(DE.vocab.itos[i])
 
 # train_iter, val_iter, test_iter = BucketIterator.splits(
-#             (train, val, test), batch_size=2, repeat=False)
+#             (train, val, test), batch_size=2, repeat=False, sort=True, sort_within_batch=False)
 # DE.vocab.stoi
 # for i in range(5):
 #     print(DE.vocab.itos[i])
@@ -97,10 +100,59 @@ def load_dataset(batch_size):
 # for i in range(len(EN.vocab)):
 #     print(EN.vocab.itos[i])
 
-# for b, batch in enumerate(train_iter):
-#         src, len_src = batch.src
-#         trg, len_trg = batch.trg
-#         print(src)
-#         print(len_src)
-#         print(trg)
-#         print(len_trg)
+
+# for e in range(3):
+#     for b, batch in enumerate(train_iter):
+#             src, len_src = batch.src
+#             trg, len_trg = batch.trg
+#             tensorToCsv2D(src,name='src',path='/home/yj/Documents/Python/Github/seq2seq/data2/gan.txt')
+#             tensorToCsv2D(len_src,name='len_src',path='/home/yj/Documents/Python/Github/seq2seq/data2/gan.txt')
+#             tensorToCsv2D(trg,name='trg',path='/home/yj/Documents/Python/Github/seq2seq/data2/gan.txt')
+#             tensorToCsv2D(len_trg,name='len_trg',path='/home/yj/Documents/Python/Github/seq2seq/data2/gan.txt')
+
+
+# import numpy
+# def tensorToCsv2D(tensor,name='defualt',path=None,token=','):
+
+#     def get_variable_name(variable):
+#         callers_local_vars = inspect.currentframe().f_back.f_locals.items()
+#         return [var_name for var_name, var_val in callers_local_vars if var_val is variable]
+
+#     name = ''.join(get_variable_name(tensor))
+
+#     assert(path is not None)
+
+#     z = tensor.numpy().tolist()
+#     if len(numpy.shape(z)) == 2:
+#         with open(path,'a') as f:
+#             f.write(name)
+#             f.write('\r')
+#             for i in range(numpy.shape(z)[0]):
+#                 for j in range(numpy.shape(z)[1]):
+#                     f.write(str(z[i][j]))
+#                     f.write(token)
+#                 f.write('\r')
+#     elif len(numpy.shape(z)) == 1:
+#         with open(path,'a') as f:
+#             f.write(name)
+#             f.write('\r')
+#             for i in range(numpy.shape(z)[0]):
+#                 f.write(str(z[i]))
+#                 f.write(token)
+#             f.write('\r')
+
+# tensorToCsv2D(src,name='src',path='/home/yj/Documents/Python/Github/seq2seq/data/gan.txt')
+# tensorToCsv2D(len_src,name='len_src',path='/home/yj/Documents/Python/Github/seq2seq/data/gan.txt')
+# tensorToCsv2D(trg,name='trg',path='/home/yj/Documents/Python/Github/seq2seq/data/gan.txt')
+# tensorToCsv2D(len_trg,name='len_trg',path='/home/yj/Documents/Python/Github/seq2seq/data/gan.txt')
+
+# with open('/home/yj/Documents/Python/Github/seq2seq/data/gan.txt','w') as f:
+#     f.write(str(src))
+#     f.write(str(len_src))
+#     f.write(str(trg))
+#     f.write(str(len_trg))
+# f
+# z = src.numpy().tolist()
+# z[0][0]
+# len(numpy.shape(z))
+# numpy.shape(z)[0]
